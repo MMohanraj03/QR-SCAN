@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ResumeQR — Upload Resume & Convert to Scannable QR Code</title>
+    <meta name="description" content="Upload or build your resume, generate a sleek custom QR code, and scan to instantly view candidate resumes on any device with rich interactive portfolios." />
+    
+    <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect width='5' height='5' x='3' y='3' rx='1'/><rect width='5' height='5' x='16' y='3' rx='1'/><rect width='5' height='5' x='3' y='16' rx='1'/><path d='M21 16h-3a2 2 0 0 0-2 2v3'/><path d='M21 21v.01'/><path d='M12 7v3a2 2 0 0 1-2 2H7'/><path d='M3 12h.01'/><path d='M12 3h.01'/><path d='M12 16v.01'/><path d='M16 12h1'/><path d='M21 12v.01'/><path d='M12 21v-1'/></svg>" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app" class="app-container">
+      
+      <!-- Top Navigation Bar -->
+      <header class="navbar" id="navbar">
+        <div class="nav-content">
+          <div class="brand-logo" id="brandLogo" role="button" tabindex="0" title="Go to Home">
+            <div class="logo-icon-wrap">
+              <svg class="logo-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="6" height="6" x="3" y="3" rx="1.5"/>
+                <rect width="6" height="6" x="15" y="3" rx="1.5"/>
+                <rect width="6" height="6" x="3" y="15" rx="1.5"/>
+                <path d="M21 15h-3a2 2 0 0 0-2 2v4"/>
+                <path d="M21 21v.01"/>
+                <path d="M12 7v3a2 2 0 0 1-2 2H7"/>
+                <path d="M16 12h5"/>
+                <path d="M12 16v5"/>
+              </svg>
+            </div>
+            <div class="brand-text">
+              <span class="brand-title">Resume<span class="gradient-text">QR</span></span>
+              <span class="brand-badge">Instant CV to QR</span>
+            </div>
+          </div>
+
+          <nav class="nav-tabs" role="tablist" aria-label="Main Navigation">
+            <button class="nav-tab active" data-tab="create" id="navTabCreate" role="tab" aria-selected="true">
+              <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              <span>Upload & Create</span>
+            </button>
+            <button class="nav-tab" data-tab="scan" id="navTabScan" role="tab" aria-selected="false">
+              <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+              <span>Scan QR Code</span>
+            </button>
+            <button class="nav-tab" data-tab="vault" id="navTabVault" role="tab" aria-selected="false">
+              <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+              <span>Resume Vault</span>
+              <span class="vault-counter" id="vaultCounter">0</span>
+            </button>
+          </nav>
+
+          <div class="nav-actions">
+            <!-- Network / Mobile Host Info button -->
+            <button class="network-badge-btn" id="networkBtn" title="QR Code target host URL (for mobile scanning)">
+              <span class="pulse-indicator"></span>
+              <span class="network-label" id="currentHostLabel">localhost:5173</span>
+              <svg class="gear-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+            <button class="btn btn-outline btn-sm" id="btnQuickDemo" title="Load an impressive pre-made demo resume">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <span>Try Demo</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content Container -->
+      <main class="main-content">
+
+        <!-- ============================================ -->
+        <!-- TAB 1: UPLOAD & CREATE RESUME -->
+        <!-- ============================================ -->
+        <section class="tab-panel active" id="panelCreate">
+          
+          <!-- Hero Banner -->
+          <div class="hero-header">
+            <div class="hero-badge">
+              <span class="badge-dot"></span>
+              <span>Next-Gen Career Portfolio & QR Gateway</span>
+            </div>
+            <h1 class="hero-title">
+              Upload Your Resume. <br />
+              <span class="gradient-text">Generate Your Instant QR Code.</span>
+            </h1>
+            <p class="hero-subtitle">
+              Transform your resume into a scannable, mobile-optimized digital portfolio. Recruiters, clients, and interviewers can scan your QR code to instantly view your complete CV, download documents, and save your contact info.
+            </p>
+          </div>
+
+          <!-- Upload & Builder Grid -->
+          <div class="creator-grid">
+            
+            <!-- Left Column: File Dropzone & Form Inputs -->
+            <div class="creator-form-card glass-card">
+              
+              <!-- Active Candidate Indicator with Unique ID & New Candidate Button -->
+              <div class="active-candidate-indicator" id="activeCandidateIndicator">
+                <div class="candidate-indicator-info">
+                  <span class="indicator-tag">ACTIVE CANDIDATE:</span>
+                  <strong class="indicator-name" id="activeCandidateName">New Candidate</strong>
+                  <span class="indicator-id-badge" id="activeCandidateId">ID: cv_...</span>
+                </div>
+                <button type="button" class="btn btn-xs btn-outline" id="btnStartFreshCandidate" title="Start a fresh candidate profile with a brand-new unique QR code">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span>+ New Candidate (New QR)</span>
+                </button>
+              </div>
+
+              <!-- Step 1: Upload File -->
+              <div class="form-section-header">
+                <div class="section-number">1</div>
+                <div>
+                  <h3 class="section-title">Upload Existing Resume Document</h3>
+                  <p class="section-desc">Supports PDF, DOCX, Images, or Text files. Each upload gets its own unique QR code!</p>
+                </div>
+              </div>
+
+              <div class="file-dropzone" id="fileDropzone" tabindex="0" role="region" aria-label="Resume file upload dropzone">
+                <input type="file" id="resumeFileInput" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.txt,.json" class="file-input-hidden" />
+                <div class="dropzone-content">
+                  <div class="upload-icon-circle">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="17 8 12 3 7 8"/>
+                      <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                  </div>
+                  <div class="upload-texts">
+                    <p class="dropzone-main-text"><strong>Click to upload</strong> or drag and drop your resume</p>
+                    <p class="dropzone-sub-text">PDF, DOCX, TXT, or Image (Max 25MB)</p>
+                    <button type="button" class="btn btn-sm btn-outline btn-browse-dropzone" id="btnBrowseFile">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                      <span>Choose File from Computer</span>
+                    </button>
+                  </div>
+                  <div class="dropzone-badges">
+                    <span class="badge-pill">PDF Auto-Preview</span>
+                    <span class="badge-pill">Unique QR Code</span>
+                    <span class="badge-pill">Mobile Ready</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Uploaded File Pill Preview & Instant Convert Bar -->
+              <div class="uploaded-file-banner hidden" id="uploadedFileBanner">
+                <div class="uploaded-file-row">
+                  <div class="uploaded-file-info">
+                    <div class="file-type-icon" id="fileTypeIcon">PDF</div>
+                    <div class="file-details">
+                      <span class="file-name" id="fileNameText">resume.pdf</span>
+                      <span class="file-size" id="fileSizeText">1.2 MB</span>
+                    </div>
+                  </div>
+                  <div class="file-actions">
+                    <button type="button" class="btn-icon" id="btnPreviewUploadedDoc" title="Quick Preview Document">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                    <button type="button" class="btn-icon btn-danger" id="btnRemoveUploadedDoc" title="Remove Uploaded File">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Instant Convert Controls -->
+                <div class="instant-convert-box">
+                  <div class="form-group mb-2">
+                    <label for="instantCandidateName">Candidate's Name for this Resume:</label>
+                    <input type="text" id="instantCandidateName" class="form-input" placeholder="e.g. John Doe" />
+                  </div>
+                  <button type="button" class="btn btn-primary btn-glow w-full" id="btnConvertFileToQR">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/></svg>
+                    <span>⚡ Convert This Resume into QR Code</span>
+                  </button>
+
+                  <!-- Success Alert after Conversion -->
+                  <div class="convert-success-alert hidden" id="convertSuccessAlert">
+                    <div class="convert-success-content">
+                      <div class="success-icon-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                      </div>
+                      <div class="success-text">
+                        <span class="success-title">Resume Converted into QR Code!</span>
+                        <span class="success-sub" id="convertSuccessSub">Scanning the QR code will open this candidate's resume.</span>
+                      </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-success" id="btnTestScannedDoc">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                      <span>📲 Test Scan & View</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="divider-text">
+                <span>OR FILL / CUSTOMIZE PROFILE DETAILS</span>
+              </div>
+
+              <!-- Step 2: Candidate Information Form -->
+              <div class="form-section-header">
+                <div class="section-number">2</div>
+                <div>
+                  <h3 class="section-title">Candidate Profile & Highlights</h3>
+                  <p class="section-desc">These details will be rendered in a stunning web portfolio when recruiters scan the QR code.</p>
+                </div>
+              </div>
+
+              <form id="resumeForm" class="resume-form" novalidate>
+                
+                <!-- Avatar & Core Identity -->
+                <div class="avatar-and-identity">
+                  <div class="avatar-uploader">
+                    <div class="avatar-preview-circle" id="avatarPreviewCircle" title="Upload profile photo or click to change">
+                      <img id="avatarImage" src="" alt="Candidate Avatar" class="avatar-img hidden" />
+                      <div class="avatar-placeholder" id="avatarPlaceholder">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <span>Photo</span>
+                      </div>
+                    </div>
+                    <input type="file" id="avatarFileInput" accept="image/*" class="file-input-hidden" />
+                    <button type="button" class="btn btn-xs btn-outline" id="btnUploadAvatar">Change Photo</button>
+                  </div>
+
+                  <div class="identity-fields">
+                    <div class="form-group">
+                      <label for="fullNameInput">Full Name <span class="required">*</span></label>
+                      <input type="text" id="fullNameInput" class="form-input" placeholder="e.g. Alex Morgan" required />
+                    </div>
+                    <div class="form-group">
+                      <label for="headlineInput">Professional Title / Headline <span class="required">*</span></label>
+                      <input type="text" id="headlineInput" class="form-input" placeholder="e.g. Lead Full-Stack Engineer" required />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Contact Information Grid -->
+                <div class="form-row-3">
+                  <div class="form-group">
+                    <label for="emailInput">Email Address <span class="required">*</span></label>
+                    <input type="email" id="emailInput" class="form-input" placeholder="alex.morgan@example.com" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="phoneInput">Phone Number</label>
+                    <input type="tel" id="phoneInput" class="form-input" placeholder="+1 (555) 345-6789" />
+                  </div>
+                  <div class="form-group">
+                    <label for="locationInput">Location</label>
+                    <input type="text" id="locationInput" class="form-input" placeholder="San Francisco, CA" />
+                  </div>
+                </div>
+
+                <!-- Social & Professional Links -->
+                <div class="form-row-3">
+                  <div class="form-group">
+                    <label for="linkedinInput">LinkedIn URL</label>
+                    <input type="url" id="linkedinInput" class="form-input" placeholder="https://linkedin.com/in/alexmorgan" />
+                  </div>
+                  <div class="form-group">
+                    <label for="githubInput">GitHub URL</label>
+                    <input type="url" id="githubInput" class="form-input" placeholder="https://github.com/alexmorgan" />
+                  </div>
+                  <div class="form-group">
+                    <label for="websiteInput">Portfolio / Website</label>
+                    <input type="url" id="websiteInput" class="form-input" placeholder="https://alexmorgan.dev" />
+                  </div>
+                </div>
+
+                <!-- Executive Summary -->
+                <div class="form-group">
+                  <label for="summaryInput">Executive Summary / About Me</label>
+                  <textarea id="summaryInput" rows="3" class="form-textarea" placeholder="Brief summary of your expertise, key achievements, and passions..."></textarea>
+                </div>
+
+                <!-- Skills Tag Input -->
+                <div class="form-group">
+                  <label>Core Skills & Technologies <span class="hint-text">(Type skill and press Enter or comma)</span></label>
+                  <div class="skills-input-wrapper" id="skillsInputWrapper">
+                    <div class="skill-tags-container" id="skillTagsContainer"></div>
+                    <input type="text" id="skillInputField" class="skill-text-input" placeholder="Add skill (e.g. TypeScript, Cloud, AI)..." />
+                  </div>
+                  <div class="skill-suggestions" id="skillSuggestions">
+                    <span class="suggestion-chip" data-skill="React">React</span>
+                    <span class="suggestion-chip" data-skill="TypeScript">TypeScript</span>
+                    <span class="suggestion-chip" data-skill="Node.js">Node.js</span>
+                    <span class="suggestion-chip" data-skill="Python">Python</span>
+                    <span class="suggestion-chip" data-skill="System Architecture">System Architecture</span>
+                    <span class="suggestion-chip" data-skill="UI/UX Design">UI/UX Design</span>
+                    <span class="suggestion-chip" data-skill="AWS / Cloud">AWS / Cloud</span>
+                    <span class="suggestion-chip" data-skill="GraphQL">GraphQL</span>
+                  </div>
+                </div>
+
+                <!-- Work Experience Section -->
+                <div class="form-collapsible">
+                  <div class="collapsible-header" id="expCollapsibleHeader">
+                    <div class="flex-center gap-2">
+                      <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                      <span class="font-semibold">Work Experience (<span id="expCountLabel">1</span>)</span>
+                    </div>
+                    <button type="button" class="btn btn-xs btn-outline" id="btnAddExperience">+ Add Position</button>
+                  </div>
+                  <div class="experience-list" id="experienceList">
+                    <!-- Dynamic Experience Cards Injected Here -->
+                  </div>
+                </div>
+
+                <!-- Education & Certifications Section -->
+                <div class="form-collapsible">
+                  <div class="collapsible-header" id="eduCollapsibleHeader">
+                    <div class="flex-center gap-2">
+                      <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                      <span class="font-semibold">Education & Certifications (<span id="eduCountLabel">1</span>)</span>
+                    </div>
+                    <button type="button" class="btn btn-xs btn-outline" id="btnAddEducation">+ Add Education</button>
+                  </div>
+                  <div class="education-list" id="educationList">
+                    <!-- Dynamic Education Cards Injected Here -->
+                  </div>
+                </div>
+
+                <!-- Projects & Highlights Section -->
+                <div class="form-collapsible">
+                  <div class="collapsible-header" id="projCollapsibleHeader">
+                    <div class="flex-center gap-2">
+                      <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                      <span class="font-semibold">Key Projects (<span id="projCountLabel">1</span>)</span>
+                    </div>
+                    <button type="button" class="btn btn-xs btn-outline" id="btnAddProject">+ Add Project</button>
+                  </div>
+                  <div class="project-list" id="projectList">
+                    <!-- Dynamic Project Cards Injected Here -->
+                  </div>
+                </div>
+
+                <!-- Form Submit Bar -->
+                <div class="form-action-bar">
+                  <button type="button" class="btn btn-secondary" id="btnResetForm">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    <span>Clear</span>
+                  </button>
+                  <button type="submit" class="btn btn-primary btn-glow" id="btnGenerateQR">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/></svg>
+                    <span>Generate & Update QR Code</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Right Column: Live QR Code Card & Quick Customizer -->
+            <div class="creator-preview-card">
+              
+              <!-- Sticky QR Preview Card -->
+              <div class="glass-card qr-studio-card" id="qrStudioCard">
+                <div class="qr-card-header">
+                  <div class="badge-status-wrap">
+                    <span class="status-indicator"></span>
+                    <span class="qr-status-text" id="qrStatusText">Active Scannable QR</span>
+                  </div>
+                  <span class="qr-live-badge">Live Ready</span>
+                </div>
+
+                <!-- QR Display Container -->
+                <div class="qr-canvas-wrapper" id="qrCanvasWrapper">
+                  <div class="qr-frame-badge" id="qrFrameBadge">SCAN TO VIEW RESUME</div>
+                  <div class="qr-glow-layer"></div>
+                  <div class="canvas-box">
+                    <canvas id="qrCanvas" width="280" height="280"></canvas>
+                  </div>
+                  <p class="qr-scan-instruction">
+                    Point your phone camera here to test scanning!
+                  </p>
+                </div>
+
+                <!-- Linked Resume File Indicator -->
+                <div class="qr-linked-file-tag hidden" id="qrLinkedFileTag">
+                  <span>📄 Linked Resume:</span>
+                  <strong id="qrLinkedFileName">resume.pdf</strong>
+                </div>
+
+                <!-- Target URL & Copy Box -->
+                <div class="qr-url-box">
+                  <div class="url-input-wrap">
+                    <svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    <input type="text" id="qrTargetUrlInput" class="qr-url-input" readonly value="http://localhost:5173/?id=demo" />
+                    <button class="btn-icon-subtle" id="btnCopyUrl" title="Copy Resume Link">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Quick Action Buttons -->
+                <div class="qr-action-buttons">
+                  <button class="btn btn-outline btn-sm w-full" id="btnSimulateScan" title="Directly open the candidate's resume page to test it">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    <span>Test Scan / Open Resume</span>
+                  </button>
+                  
+                  <div class="btn-group-2">
+                    <button class="btn btn-secondary btn-sm" id="btnDownloadQRPNG">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                      <span>PNG (High-Res)</span>
+                    </button>
+                    <button class="btn btn-secondary btn-sm" id="btnPrintBadge">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                      <span>Print ID Badge</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- QR Style Customizer -->
+                <div class="qr-customizer-section">
+                  <div class="customizer-title">Customize QR Aesthetics</div>
+                  
+                  <!-- Color Themes -->
+                  <div class="color-palette-picker">
+                    <button class="color-preset-circle active" data-color="#6366f1" data-bg="#ffffff" title="Cyber Violet on White" style="background: linear-gradient(135deg, #6366f1, #06b6d4)"></button>
+                    <button class="color-preset-circle" data-color="#0f172a" data-bg="#ffffff" title="Classic Pitch Black on White" style="background: #0f172a"></button>
+                    <button class="color-preset-circle" data-color="#059669" data-bg="#ffffff" title="Emerald Green on White" style="background: #059669"></button>
+                    <button class="color-preset-circle" data-color="#2563eb" data-bg="#ffffff" title="Electric Royal Blue on White" style="background: #2563eb"></button>
+                    <button class="color-preset-circle" data-color="#e11d48" data-bg="#ffffff" title="Crimson Ruby on White" style="background: #e11d48"></button>
+                    <button class="color-preset-circle" data-color="#ffffff" data-bg="#090d16" title="Dark Mode: Pure White on Dark Slate" style="background: #1e293b; border: 2px solid #6366f1"></button>
+                  </div>
+
+                  <!-- Frame Text Selector -->
+                  <div class="frame-text-select-row">
+                    <label for="qrFrameSelect">Frame Badge Text:</label>
+                    <select id="qrFrameSelect" class="form-select-sm">
+                      <option value="SCAN TO VIEW RESUME">SCAN TO VIEW RESUME</option>
+                      <option value="VIEW CANDIDATE CV">VIEW CANDIDATE CV</option>
+                      <option value="HIRE ME — SCAN NOW">HIRE ME — SCAN NOW</option>
+                      <option value="EXECUTIVE PORTFOLIO">EXECUTIVE PORTFOLIO</option>
+                      <option value="NONE">No Frame Text</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Scan Counter & Saved State -->
+                <div class="qr-footer-meta">
+                  <div class="meta-item">
+                    <span class="meta-label">Total Scans:</span>
+                    <span class="meta-value" id="currentScanCount">0</span>
+                  </div>
+                  <div class="meta-item">
+                    <span class="meta-label">Storage:</span>
+                    <span class="meta-value badge-green">IndexedDB Saved</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- TAB 2: BUILT-IN QR SCANNER -->
+        <!-- ============================================ -->
+        <section class="tab-panel" id="panelScan">
+          <div class="scanner-container">
+            <div class="scanner-header text-center">
+              <div class="hero-badge">
+                <span class="badge-dot"></span>
+                <span>Camera & Image QR Decoder</span>
+              </div>
+              <h2 class="scanner-title">Scan Any Resume QR Code</h2>
+              <p class="scanner-desc">Use your web camera or drag & drop a QR code image / screenshot to open the candidate's verified resume instantly.</p>
+            </div>
+
+            <div class="scanner-interactive-box glass-card">
+              <!-- Scanner Mode Tabs -->
+              <div class="scanner-mode-switch">
+                <button class="mode-tab-btn active" id="btnModeCamera">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  <span>Camera Live Scan</span>
+                </button>
+                <button class="mode-tab-btn" id="btnModeImage">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                  <span>Upload QR Image</span>
+                </button>
+                <button class="mode-tab-btn" id="btnModeManual">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 15 6 6m-6-6v4.5m0-4.5h4.5M9 9l-6-6m6 6V4.5M9 9H4.5"/></svg>
+                  <span>Direct ID / Link</span>
+                </button>
+              </div>
+
+              <!-- View 1: Live Video Camera -->
+              <div class="scanner-view-content" id="scannerCameraView">
+                <div class="camera-stream-wrapper">
+                  <div id="qrReader" class="html5-qr-reader-target"></div>
+                  <div class="camera-reticle" id="cameraReticle">
+                    <div class="reticle-corner tl"></div>
+                    <div class="reticle-corner tr"></div>
+                    <div class="reticle-corner bl"></div>
+                    <div class="reticle-corner br"></div>
+                    <div class="laser-scanner-line"></div>
+                  </div>
+                </div>
+                <div class="camera-controls">
+                  <button class="btn btn-primary" id="btnStartCamera">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span>Start Live Camera</span>
+                  </button>
+                  <button class="btn btn-secondary hidden" id="btnStopCamera">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="5" y="5" rx="2"/></svg>
+                    <span>Stop Camera</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- View 2: Image File Dropzone -->
+              <div class="scanner-view-content hidden" id="scannerImageView">
+                <div class="qr-image-dropzone" id="qrImageDropzone" tabindex="0">
+                  <input type="file" id="qrImageFileInput" accept="image/*" class="file-input-hidden" />
+                  <div class="dropzone-content">
+                    <div class="upload-icon-circle">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                    </div>
+                    <p class="dropzone-main-text">Drop a QR code image here or <strong>browse file</strong></p>
+                    <p class="dropzone-sub-text">PNG, JPG, WEBP screenshots or photos</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- View 3: Direct Manual Link -->
+              <div class="scanner-view-content hidden" id="scannerManualView">
+                <div class="manual-input-box">
+                  <label for="manualScanInput">Paste Candidate URL or Resume ID:</label>
+                  <div class="input-with-button">
+                    <input type="text" id="manualScanInput" class="form-input" placeholder="e.g. resume_172812345 or full URL" />
+                    <button class="btn btn-primary" id="btnSubmitManualScan">Open Resume</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Scanner Results Banner -->
+              <div class="scan-status-alert hidden" id="scanStatusAlert">
+                <div class="alert-icon">✨</div>
+                <div class="alert-content">
+                  <div class="alert-title" id="scanAlertTitle">QR Detected!</div>
+                  <div class="alert-desc" id="scanAlertDesc">Redirecting to candidate resume...</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- TAB 3: RESUME VAULT / LIBRARY -->
+        <!-- ============================================ -->
+        <section class="tab-panel" id="panelVault">
+          <div class="vault-container">
+            <div class="vault-header">
+              <div>
+                <h2 class="vault-title">Resume Vault & Candidate Library</h2>
+                <p class="vault-desc">All resumes created and scanned in this browser are securely stored in local IndexedDB.</p>
+              </div>
+              <div class="vault-actions">
+                <button class="btn btn-outline btn-sm" id="btnImportJSON">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <span>Import Resume</span>
+                </button>
+                <input type="file" id="importJsonInput" accept=".json" class="file-input-hidden" />
+                <button class="btn btn-primary btn-sm" id="btnVaultNewResume">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                  <span>Create New Resume</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Vault Search & Filter Bar -->
+            <div class="vault-filter-bar glass-card">
+              <div class="search-input-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input type="text" id="vaultSearchInput" class="vault-search-field" placeholder="Search candidates by name, title, or skills..." />
+              </div>
+              <div class="vault-stats-chips">
+                <span class="chip-item">Total Resumes: <strong id="vaultTotalCount">0</strong></span>
+                <span class="chip-item">Total QR Scans: <strong id="vaultTotalScans">0</strong></span>
+              </div>
+            </div>
+
+            <!-- Vault Grid of Resumes -->
+            <div class="vault-grid" id="vaultGrid">
+              <!-- Rendered via JS -->
+            </div>
+
+            <!-- Empty State for Vault -->
+            <div class="vault-empty-state hidden" id="vaultEmptyState">
+              <div class="empty-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+              </div>
+              <h3>No Resumes in Vault Yet</h3>
+              <p>Create your first resume or test one of our pre-built executive demo profiles.</p>
+              <div class="empty-state-buttons">
+                <button class="btn btn-primary" id="btnEmptyCreate">Create Resume</button>
+                <button class="btn btn-outline" id="btnEmptyDemo">Load Demo Candidates</button>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- TAB 4: CANDIDATE RESUME SHOWCASE (SCANNED VIEW) -->
+        <!-- ============================================ -->
+        <section class="tab-panel" id="panelShowcase">
+          <div class="showcase-container" id="showcaseContainer">
+            
+            <!-- Scanned Success Notification Bar -->
+            <div class="scan-verified-banner" id="scanVerifiedBanner">
+              <div class="verified-content">
+                <div class="verified-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div>
+                  <span class="verified-title">QR Code Verified</span>
+                  <span class="verified-sub">Candidate profile retrieved directly from secure database.</span>
+                </div>
+              </div>
+              <div class="verified-actions">
+                <button class="btn btn-sm btn-ghost" id="btnShowcaseBack">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                  <span>Back to App</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Scanned Document Prominent Highlight Banner -->
+            <div class="scanned-resume-file-banner hidden" id="scannedResumeFileBanner">
+              <div class="banner-file-info">
+                <div class="file-icon-badge" id="bannerFileIconBadge">📄</div>
+                <div>
+                  <div class="banner-file-title" id="scannedDocTitle">Candidate_Resume.pdf</div>
+                  <div class="banner-file-sub" id="scannedDocSub">Displaying original uploaded document converted from QR Code</div>
+                </div>
+              </div>
+              <div class="scanned-doc-actions">
+                <a id="btnBannerDownloadDoc" href="#" download class="btn btn-sm btn-primary">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <span>Download Resume File</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Executive Resume Paper / Card Container -->
+            <div class="showcase-paper glass-card" id="showcasePaper">
+              
+              <!-- Showcase Toolbar -->
+              <div class="showcase-toolbar no-print">
+                <div class="toolbar-left">
+                  <span class="profile-timestamp" id="showcaseTimestamp">Updated Recently</span>
+                  <span class="scan-pill" id="showcaseScanBadge">⚡ Scanned 1 time</span>
+                </div>
+                <div class="toolbar-right">
+                  <button class="btn btn-sm btn-outline" id="btnDownloadVCard" title="Save candidate contact card (.vcf) directly into your phone contacts">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>Save Contact (vCard)</span>
+                  </button>
+                  <button class="btn btn-sm btn-outline" id="btnPrintResume" title="Print or save as professional PDF document">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                    <span>Print / PDF</span>
+                  </button>
+                  <button class="btn btn-sm btn-outline" id="btnShowcaseQRModal" title="Display candidate QR Code">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/></svg>
+                    <span>Show QR</span>
+                  </button>
+                  <button class="btn btn-sm btn-secondary" id="btnShareShowcase">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                    <span>Share</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Profile Switcher Tabs (Portfolio View vs Original Uploaded PDF Document) -->
+              <div class="showcase-view-switchers no-print" id="showcaseViewSwitchers">
+                <button class="view-switch-btn active" id="btnViewInteractive">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                  <span>Interactive Portfolio Profile</span>
+                </button>
+                <button class="view-switch-btn" id="btnViewOriginalDoc">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                  <span>Original Uploaded Document (<span id="showcaseDocName">PDF</span>)</span>
+                </button>
+              </div>
+
+              <!-- VIEW A: Interactive Digital Resume -->
+              <div class="showcase-interactive-body" id="showcaseInteractiveBody">
+                
+                <!-- Candidate Hero Header -->
+                <div class="candidate-hero">
+                  <div class="candidate-avatar-wrap">
+                    <img id="showcaseAvatar" class="candidate-hero-avatar" src="" alt="Candidate Avatar" />
+                    <div class="verified-dot" title="Verified Profile">
+                      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1.5 14.5L6 12l1.4-1.4 3.1 3.1 7.1-7.1L19 8l-8.5 8.5z"/></svg>
+                    </div>
+                  </div>
+
+                  <div class="candidate-meta">
+                    <div class="candidate-title-row">
+                      <h1 class="candidate-name" id="showcaseName">Alex Morgan</h1>
+                      <span class="candidate-status-pill">Available for Hire</span>
+                    </div>
+                    <p class="candidate-headline" id="showcaseHeadline">Lead Full-Stack Engineer & Cloud Architect</p>
+
+                    <!-- Contact Pills -->
+                    <div class="candidate-contact-pills" id="showcaseContactPills">
+                      <!-- Rendered via JS -->
+                    </div>
+                  </div>
+
+                  <!-- Small Scannable QR in corner for Print / Reference -->
+                  <div class="showcase-mini-qr" id="showcaseMiniQR" title="Scan to reopen this profile">
+                    <canvas id="miniQrCanvas" width="96" height="96"></canvas>
+                    <span class="mini-qr-label">Scan to Share</span>
+                  </div>
+                </div>
+
+                <!-- Executive Summary -->
+                <div class="showcase-section" id="showcaseSummarySection">
+                  <h3 class="showcase-section-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    <span>About & Executive Summary</span>
+                  </h3>
+                  <div class="showcase-summary-text" id="showcaseSummaryText">
+                    Passionate engineering leader with over 8 years of experience architecting resilient distributed systems, modern reactive web applications, and high-throughput cloud infrastructure.
+                  </div>
+                </div>
+
+                <!-- Core Skills & Competencies -->
+                <div class="showcase-section" id="showcaseSkillsSection">
+                  <h3 class="showcase-section-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    <span>Core Skills & Technologies</span>
+                  </h3>
+                  <div class="showcase-skills-grid" id="showcaseSkillsGrid">
+                    <!-- Skills pills injected via JS -->
+                  </div>
+                </div>
+
+                <!-- Professional Experience Timeline -->
+                <div class="showcase-section" id="showcaseExperienceSection">
+                  <h3 class="showcase-section-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    <span>Work Experience</span>
+                  </h3>
+                  <div class="showcase-timeline" id="showcaseTimeline">
+                    <!-- Injected via JS -->
+                  </div>
+                </div>
+
+                <!-- Education & Certifications -->
+                <div class="showcase-section" id="showcaseEducationSection">
+                  <h3 class="showcase-section-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                    <span>Education & Certifications</span>
+                  </h3>
+                  <div class="showcase-edu-grid" id="showcaseEduGrid">
+                    <!-- Injected via JS -->
+                  </div>
+                </div>
+
+                <!-- Featured Projects -->
+                <div class="showcase-section" id="showcaseProjectsSection">
+                  <h3 class="showcase-section-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                    <span>Featured Projects</span>
+                  </h3>
+                  <div class="showcase-projects-grid" id="showcaseProjectsGrid">
+                    <!-- Injected via JS -->
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- VIEW B: Embedded Original Document / PDF Viewer -->
+              <div class="showcase-doc-body hidden" id="showcaseDocBody">
+                <div class="doc-viewer-header">
+                  <div class="doc-file-tag">
+                    <span class="badge-pill" id="docTypeTag">PDF DOCUMENT</span>
+                    <span class="doc-title-text" id="docViewerTitle">resume.pdf</span>
+                  </div>
+                  <div class="doc-viewer-actions">
+                    <a id="btnDownloadOriginalDoc" href="#" download class="btn btn-sm btn-primary">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                      <span>Download File</span>
+                    </a>
+                    <button class="btn btn-sm btn-outline" id="btnToggleFullScreenDoc">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                      <span>Full Screen</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="doc-frame-wrapper" id="docFrameWrapper">
+                  <iframe id="docViewerIframe" class="doc-viewer-iframe" title="Uploaded Resume Document"></iframe>
+                  <img id="docViewerImage" class="doc-viewer-image hidden" alt="Uploaded Resume Document" />
+                  <div id="docViewerFallback" class="doc-fallback-card hidden">
+                    <div class="upload-icon-circle">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    </div>
+                    <h4>Uploaded Document Ready</h4>
+                    <p>Click below to download or view the candidate's original resume document in a new tab.</p>
+                    <a id="btnFallbackDownload" href="#" download class="btn btn-primary">Download Document</a>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- ============================================ -->
+      <!-- MODALS & POPUPS -->
+      <!-- ============================================ -->
+
+      <!-- Network / Mobile LAN IP Configuration Dialog -->
+      <dialog class="modal-dialog" id="networkModal">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div class="flex-center gap-2">
+              <span class="pulse-indicator"></span>
+              <h3 class="modal-title">Mobile Phone Scanning Setup</h3>
+            </div>
+            <button class="btn-icon" id="btnCloseNetworkModal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p class="modal-desc">
+              When scanning the QR code using a real smartphone camera, the phone needs to reach your computer's server on the same Wi-Fi network.
+            </p>
+            
+            <div class="info-alert-box">
+              <strong>💡 Scanning from the same computer?</strong><br />
+              You can keep the default <code>localhost</code> or click <em>"Test Scan / Open Resume"</em>.
+            </div>
+
+            <div class="info-alert-box highlight">
+              <strong>📱 Scanning with your physical mobile phone?</strong><br />
+              Replace <code>localhost</code> with your computer's local Wi-Fi IP address (e.g. <code>192.168.1.100:5173</code>) so your phone's browser can connect.
+            </div>
+
+            <div class="form-group mt-3">
+              <label for="customHostInput">Host Origin for QR Code:</label>
+              <div class="input-with-button">
+                <input type="text" id="customHostInput" class="form-input" placeholder="http://192.168.1.xxx:5173" />
+                <button class="btn btn-secondary btn-sm" id="btnDetectHost">Reset to Current Origin</button>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" id="btnCancelNetworkModal">Cancel</button>
+            <button class="btn btn-primary" id="btnSaveNetworkHost">Save & Update QR Codes</button>
+          </div>
+        </div>
+      </dialog>
+
+      <!-- Printable ID Badge / Lanyard Card Preview Modal -->
+      <dialog class="modal-dialog badge-modal" id="badgeModal">
+        <div class="modal-card modal-card-lg">
+          <div class="modal-header">
+            <h3 class="modal-title">Printable Executive Career Badge</h3>
+            <button class="btn-icon" id="btnCloseBadgeModal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p class="modal-desc">Ready-to-print lanyard card for job fairs, tech conferences, and interviews:</p>
+            
+            <!-- Badge Card Print Sheet -->
+            <div class="badge-print-stage">
+              <div class="badge-card" id="printableBadgeCard">
+                <div class="badge-header-strip">
+                  <span class="badge-org-title">RESUMEQR • VERIFIED CANDIDATE</span>
+                  <span class="badge-chip">CONF 2026</span>
+                </div>
+                <div class="badge-body">
+                  <div class="badge-avatar-wrap">
+                    <img id="badgeAvatarImg" src="" alt="Avatar" class="badge-avatar" />
+                  </div>
+                  <div class="badge-info">
+                    <h2 class="badge-name" id="badgeName">Alex Morgan</h2>
+                    <p class="badge-title" id="badgeTitle">Lead Full-Stack Engineer</p>
+                    <div class="badge-skills" id="badgeSkills">
+                      <span>React</span><span>TypeScript</span><span>Cloud</span>
+                    </div>
+                  </div>
+                  <div class="badge-qr-box">
+                    <canvas id="badgeQrCanvas" width="140" height="140"></canvas>
+                    <span class="badge-qr-text">SCAN FOR FULL CV</span>
+                  </div>
+                </div>
+                <div class="badge-footer-strip">
+                  <span id="badgeContactEmail">alex.morgan@example.com</span>
+                  <span>Instant Mobile Access</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" id="btnPrintBadgeSheet">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+              <span>Print Badge Card</span>
+            </button>
+            <button class="btn btn-primary" id="btnDoneBadgeModal">Done</button>
+          </div>
+        </div>
+      </dialog>
+
+      <!-- Toast Notification Container -->
+      <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+    </div>
+
+    <!-- Main Module Script -->
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
